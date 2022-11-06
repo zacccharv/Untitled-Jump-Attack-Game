@@ -4,18 +4,31 @@ using UnityEngine;
 
 namespace ZaccCharv
 {
-    public class StatusBar : MonoBehaviour
+    [CreateAssetMenu(fileName = "NewStatusBar", menuName = "StatusBar")]
+    public class StatusBar : ScriptableObject
     {
-        // Start is called before the first frame update
-        void Start()
+        public float statusBarTotal;
+        public float statusBarCurrent;
+        public float IncrementAmount[] = float["addToBarTotal", "subtractFromBarTotal", "addToCurrent", "subtractFromCurrent"]; 
+
+        void AddToBarTotal()
         {
-        
+            statusBarTotal += IncrementAmount["addToBarTotal"];
         }
 
-        // Update is called once per frame
-        void Update()
+        void SubtractFromBarTotal()
         {
-        
+            statusBarTotal -= IncrementAmount["subtractFromBarTotal"];
+        }
+
+        void AddToCurrent()
+        {
+            statusBarCurrent += IncrementAmount["addToCurrent"];
+        } 
+
+        void SubtractFromCurrent()
+        {
+            statusBarCurrent -= IncrementAmount["subtractFromCurrent"];
         }
     }
 }
