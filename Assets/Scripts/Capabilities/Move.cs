@@ -1,8 +1,5 @@
-using System.Runtime.InteropServices;
-using System.Security.Cryptography.X509Certificates;
-using Unity.VisualScripting;
 using UnityEngine;
-
+using ZaccCharv;
 
 [RequireComponent(typeof(Controller))]
 public class Move : MonoBehaviour
@@ -54,14 +51,14 @@ public class Move : MonoBehaviour
             if (_direction.x != 0)
             {
                 _velocity.x = Mathf.MoveTowards(_velocity.x, _desiredVelocity.x, _maxSpeedChange) + (_desiredVelocity.x / 2);
-            } 
+            }
 
         }
         if (!_onPlatform)
         {
             _velocity = _body.velocity;
 
-            _velocity.x = Mathf.MoveTowards(_velocity.x, _desiredVelocity.x, _maxSpeedChange) ;
+            _velocity.x = Mathf.MoveTowards(_velocity.x, _desiredVelocity.x, _maxSpeedChange);
         }
 
 

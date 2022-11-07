@@ -1,6 +1,7 @@
 using UnityEngine;
 
-
+namespace ZaccCharv
+{
     public class Ground : MonoBehaviour
     {
         public bool OnGround { get; private set; }
@@ -11,10 +12,10 @@ using UnityEngine;
         private PhysicsMaterial2D _material;
         private Animator _animator;
 
-    private void Start()
-    {
-        _animator = GetComponent<Animator>();
-    }
+        private void Start()
+        {
+            _animator = GetComponent<Animator>();
+        }
 
         private void OnCollisionExit2D(Collision2D collision)
         {
@@ -51,9 +52,10 @@ using UnityEngine;
 
             Friction = 0;
 
-            if(_material != null)
+            if (_material != null)
             {
                 Friction = _material.friction;
             }
         }
     }
+}

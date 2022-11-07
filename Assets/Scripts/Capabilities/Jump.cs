@@ -1,6 +1,7 @@
 using UnityEngine;
+using ZaccCharv;
 
-    [RequireComponent(typeof(Controller))]
+[RequireComponent(typeof(Controller))]
     public class Jump : MonoBehaviour
     {
         [SerializeField, Range(0f, 10f)] private float _jumpHeight = 3f;
