@@ -16,6 +16,7 @@ namespace ZaccCharv
         public int staminaMax;
         public int total;
         public int current;
+        public float staminaBurnRate;
 
         private void Update()
         {
@@ -24,11 +25,20 @@ namespace ZaccCharv
 
         private void OnTriggerEnter2D(Collider2D collision)
         {
-            if (collision.gameObject.layer == 10)
+            if (collision.gameObject.layer == 10 && coroutine != null)
             {
                 safe = true;
                 current = total;
                 StopCoroutine(coroutine);
+            }
+            if (collision.gameObject.tag == "Energy")
+            {
+                current = total;
+                StopCoroutine(coroutine);
+
+                coroutine = Timer(staminaBurnRate, total);
+                StartCoroutine(coroutine);
+                collision.gameObject.SetActive(false);
             }
         }
 
@@ -37,7 +47,7 @@ namespace ZaccCharv
             if (collision.gameObject.layer == 10)
             {
                 safe = false;
-                coroutine = Timer(1.75f, total);
+                coroutine = Timer(staminaBurnRate, total);
                 StartCoroutine(coroutine);
             }
         }
@@ -49,7 +59,7 @@ namespace ZaccCharv
             for (int i = total; i > 0; i--)
             { 
                 SubtractFromCurrent();
-                if (current == 0)
+                if (current == 10)
                 {
                     SceneManager.LoadScene(SceneManager.GetActiveScene().name);
                 }

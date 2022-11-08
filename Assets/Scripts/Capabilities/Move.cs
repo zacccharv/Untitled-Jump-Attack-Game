@@ -1,4 +1,5 @@
 using UnityEngine;
+using UnityEngine.TextCore.Text;
 using ZaccCharv;
 
 [RequireComponent(typeof(Controller))]
@@ -13,13 +14,14 @@ public class Move : MonoBehaviour
     public Vector2 _velocity, _desiredVelocity;
     public Rigidbody2D _body;
     private Ground _ground;
+    private SliderJoint2D _sliderJoint;
     public PlatformVelocity platform;
 
     private float _maxSpeedChange, _acceleration;
     private bool _onGround;
     public bool _onPlatform;
 
-    void Awake()
+    void Start()
     {
         _body = GetComponent<Rigidbody2D>();
         _ground = GetComponent<Ground>();
@@ -35,6 +37,7 @@ public class Move : MonoBehaviour
         {
             _onPlatform = false;
         }
+
     }
 
     void FixedUpdate()
@@ -50,7 +53,8 @@ public class Move : MonoBehaviour
             _velocity = platform._velocity;
             if (_direction.x != 0)
             {
-                _velocity.x = Mathf.MoveTowards(_velocity.x, _desiredVelocity.x, _maxSpeedChange) + (_desiredVelocity.x / 2);
+                _body.gravityScale = 1;
+                _velocity.x = Mathf.MoveTowards(_velocity.x, _desiredVelocity.x, _maxSpeedChange) + (_desiredVelocity.x);
             }
 
         }
@@ -59,23 +63,21 @@ public class Move : MonoBehaviour
             _velocity = _body.velocity;
 
             _velocity.x = Mathf.MoveTowards(_velocity.x, _desiredVelocity.x, _maxSpeedChange);
-        }
 
+        }
 
         _body.velocity = _velocity;
     }
 
     private void OnCollisionEnter2D(Collision2D collision)
     {
-        if (collision.gameObject.tag == "Platform")
+        if (collision.gameObject.tag == "Platform" && collision != null)
         {
             Debug.Log("I have Entered");
             platform = collision.gameObject.GetComponent<PlatformVelocity>();
-
             _onPlatform = true;
         }
     }
-
 
     private void OnCollisionExit2D(Collision2D collision)
     {
