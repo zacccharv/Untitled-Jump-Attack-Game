@@ -10,11 +10,10 @@ public class Move : MonoBehaviour
     [SerializeField, Range(0f, 100f)] private float _maxAirAcceleration = 20f;
 
     [SerializeField] private Controller _controller = null;
-    private Vector2 _direction;
+    public Vector2 _direction;
     public Vector2 _velocity, _desiredVelocity;
     public Rigidbody2D _body;
     private Ground _ground;
-    private SliderJoint2D _sliderJoint;
     public PlatformVelocity platform;
 
     private float _maxSpeedChange, _acceleration;
@@ -31,7 +30,6 @@ public class Move : MonoBehaviour
     void Update()
     {
         _direction.x = _controller.input.RetrieveMoveInput();
-        _desiredVelocity = new Vector2(_direction.x, 0f) * Mathf.Max(_maxSpeed - _ground.Friction, 0f);
 
         if (_controller.input.RetrieveJumpInput())
         {
@@ -42,6 +40,8 @@ public class Move : MonoBehaviour
 
     void FixedUpdate()
     {
+
+        _desiredVelocity = new Vector2(_direction.x, 0f) * Mathf.Max(_maxSpeed - _ground.Friction, 0f);
         _onGround = _ground.OnGround;
         _velocity = _body.velocity;
 
@@ -51,12 +51,11 @@ public class Move : MonoBehaviour
         if (_onPlatform)
         {
             _velocity = platform._velocity;
+
             if (_direction.x != 0)
             {
-                _body.gravityScale = 1;
                 _velocity.x = Mathf.MoveTowards(_velocity.x, _desiredVelocity.x, _maxSpeedChange) + (_desiredVelocity.x);
             }
-
         }
         if (!_onPlatform)
         {
@@ -71,6 +70,7 @@ public class Move : MonoBehaviour
 
     private void OnCollisionEnter2D(Collision2D collision)
     {
+
         if (collision.gameObject.tag == "Platform" && collision != null)
         {
             Debug.Log("I have Entered");

@@ -9,7 +9,7 @@ namespace ZaccCharv
 {
     public class CharacterStatusBar : MonoBehaviour
     {
-        [SerializeField] private bool safe = true;
+/*        [SerializeField] private bool safe = true;*/
 
         private IEnumerator coroutine;
 
@@ -27,7 +27,7 @@ namespace ZaccCharv
         {
             if (collision.gameObject.layer == 10 && coroutine != null)
             {
-                safe = true;
+/*                safe = true;*/
                 current = total;
                 StopCoroutine(coroutine);
             }
@@ -46,7 +46,7 @@ namespace ZaccCharv
         {
             if (collision.gameObject.layer == 10)
             {
-                safe = false;
+/*                safe = false;*/
                 coroutine = Timer(staminaBurnRate, total);
                 StartCoroutine(coroutine);
             }
