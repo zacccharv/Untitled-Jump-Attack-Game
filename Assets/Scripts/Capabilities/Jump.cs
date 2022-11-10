@@ -19,20 +19,24 @@ public class Jump : MonoBehaviour
     [SerializeField] private Controller _controller = null;
 
     private float _defaultGravityScale, _jumpSpeed;
+    private bool _touchingBottom;
 
     #endregion
-
 
     public bool _desiredJump, _onGround;
 
     public int _jumpPhase;
 
+    [SerializeField, Range(0f, 5f)] public float _doubleJumpMultiplier = 3f;
+
     #region Wall Jumping and Sliding Vars
 
-    public bool _leftWallHit, _rightWallhit;
+    private bool _leftWallHit, _rightWallhit;
     private bool _wallSliding;
-    private bool _wallJumping;
+    public bool _wallJumping;
     public float _wallJumpTime;
+    public float _wallJumpVelocityX, _wallJumpVelocityY;
+    public bool _wallGrab;
 
     #endregion
 
@@ -56,13 +60,37 @@ public class Jump : MonoBehaviour
         _onGround = _ground.OnGround;
         _velocity = _body.velocity;
 
-        JumpActionCheck();
+        if (_onGround && !_wallSliding)
+        {
+            _jumpPhase = 0;
+        }
+        if (_desiredJump)
+        {
+            _desiredJump = false;
+            JumpAction();
+        }
+        if (_body.velocity.y > 0 && !_wallSliding && Input.GetButton("Jump"))
+        {
+            _body.gravityScale = _upwardMovementMultiplier;
+        }
+        if (_body.velocity.y < 0 && !_wallSliding || (!Input.GetButton("Jump") && _touchingBottom == false))
+        {
+            _body.gravityScale = _downwardMovementMultiplier + .5f;
+        }
+        else if (_body.velocity.y == 0)
+        {
+            _body.gravityScale = _defaultGravityScale;
+        }
+        else if (_jumpPhase == 1 && _touchingBottom == false)
+        {
+            _body.gravityScale = _doubleJumpMultiplier + .5f;
+        }
 
         WallHitCheck();
 
         WallSlidingCheck();
 
-        JumpVelocityCheck();
+        WallGrabCheck();
 
         if (_wallJumping == true)
         {
@@ -76,25 +104,10 @@ public class Jump : MonoBehaviour
         }
 
     }
-    private void JumpVelocityCheck()
-    {
-        if (_body.velocity.y > 0)
-        {
-            _body.gravityScale = _upwardMovementMultiplier;
-        }
-        if (((_body.velocity.y < 0 || !_controller.input.RetrieveJumpInput()) && !(_wallSliding)) || _wallJumping == false)
-        {
-            _body.gravityScale = _downwardMovementMultiplier + .5f;
-        }
-        else if (_body.velocity.y == 0)
-        {
-            _body.gravityScale = _defaultGravityScale;
-        }
-    }
 
-    private void JumpAction()
+    public void JumpAction()
     {
-        if (_onGround || _jumpPhase < _maxAirJumps && !(_rightWallhit || _leftWallHit))
+        if ((_onGround || _jumpPhase < _maxAirJumps) && _wallSliding == false)
         {
             _jumpPhase += 1;
 
@@ -113,10 +126,9 @@ public class Jump : MonoBehaviour
             }
             _velocity.y += _jumpSpeed;
         }
-        if (_wallSliding && _body.velocity.y < 0)
-        {
-            _jumpPhase += 2;
 
+        if (_wallSliding && _body.velocity.y <= 0)
+        {
             _animator.SetTrigger("Jumped");
             _animator.SetBool("Falling", false);
             _body.gravityScale = _downwardMovementMultiplier + .5f;
@@ -129,18 +141,10 @@ public class Jump : MonoBehaviour
         }
     }
 
-    private void JumpActionCheck()
+/*    private void JumpActionCheck()
     {
-        if (_onGround)
-        {
-            _jumpPhase = 0;
-        }
-        if (_desiredJump)
-        {
-            _desiredJump = false;
-            JumpAction();
-        }
-    }
+
+    }*/
 
     private void WallHitCheck()
     {
@@ -173,6 +177,14 @@ public class Jump : MonoBehaviour
             Debug.DrawRay(transform.position, transform.TransformDirection(Vector2.right) * 1000, Color.white);
             Debug.DrawRay(transform.position, transform.TransformDirection(Vector2.left) * 1000, Color.white);
         }
+        if (DownCast)
+        {
+            _touchingBottom = true;
+        }
+        else
+        {
+            _touchingBottom = false;
+        }
     }
 
     private void WallSlidingCheck()
@@ -185,17 +197,73 @@ public class Jump : MonoBehaviour
         {
             _wallSliding = false;
         }
-        if (_wallSliding && !_controller.input.RetrieveJumpInput())
+        if (_wallSliding && (_controller.input.RetrieveMoveInput() != 0 && _controller.input.RetrieveMoveInput2() != 0) && _body.velocity.y < 0)
         {
             _body.gravityScale = _downwardMovementMultiplier / 10;
-            int _newJumpPhase = Mathf.Max(_jumpPhase, 0);
-            _jumpPhase -= _newJumpPhase;
+            _jumpPhase = 1;
+        } 
+        else if (_wallSliding && _controller.input.RetrieveMoveInput() == 0 && _controller.input.RetrieveMoveInput2() == 0 && !_wallGrab)
+        {
+            _body.gravityScale = _downwardMovementMultiplier + .5f;
         }
     }
 
-    private void WallJumpAction()
+    private void WallGrabCheck()
     {
-        float _direction = _controller.input.RetrieveMoveInput() * -1;
+        if (_wallSliding)
+        {
+            if (Input.GetButton("WallGrab"))
+            {
+                _wallGrab = true;
+            }
+            if (!Input.GetButton("WallGrab"))
+            {
+                _wallGrab = false;
+            }
+        }
+        if (!_wallSliding || Input.GetButton("Jump"))
+        {
+            _wallGrab = false;
+        }
+
+        if (_wallGrab && !_controller.input.RetrieveJumpInput())
+        {
+            _body.gravityScale = 0;
+            _body.velocity = new Vector2(0, 0);
+            _wallGrab = true;
+        }
+        else if (_wallGrab == false || (_wallGrab == true && _wallJumpTime > 0))
+        {
+            float _direction = 0;
+
+            if (_rightWallhit)
+            {
+                _direction = -1;
+            }
+            if (_leftWallHit)
+            {
+                _direction = 1;
+            }
+
+            _body.gravityScale = _doubleJumpMultiplier + .5f;
+            Vector2 _wallJumpVelocity = new Vector2(_wallJumpVelocityX * _direction, _wallJumpVelocityY + (_controller.input.RetrieveMoveInput2() * 3));
+            _body.velocity = _wallJumpVelocity;
+        }
+    }
+
+    public void WallJumpAction()
+    {
+        float _direction = 0;
+
+        if (_rightWallhit)
+        {
+            _direction = -1;
+        }
+        if (_leftWallHit)
+        {
+            _direction = 1;
+        }
+
         _body.gravityScale = _downwardMovementMultiplier + .5f;
 
         if (_rightWallhit || _leftWallHit)
@@ -203,7 +271,12 @@ public class Jump : MonoBehaviour
             _wallJumping = false;
         }
 
-        Vector2 _wallJumpVelocity = new Vector2(15 * _direction, 30);
+        Vector2 _wallJumpVelocity = new Vector2(_wallJumpVelocityX * _direction, _wallJumpVelocityY + (_controller.input.RetrieveMoveInput2() * 3));
+
+/*        if (_wallGrab)
+        {
+            _wallJumpVelocity = new Vector2((_wallJumpVelocityX * 2) * _direction, _wallJumpVelocityY + (_controller.input.RetrieveMoveInput2() * 3));
+        }*/
         _body.velocity = _wallJumpVelocity;
     }
 

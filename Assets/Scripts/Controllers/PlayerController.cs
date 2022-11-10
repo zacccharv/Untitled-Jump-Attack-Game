@@ -1,16 +1,21 @@
 using UnityEngine;
 using ZaccCharv;
 
-    [CreateAssetMenu(fileName = "PlayerController", menuName = "InputController/PlayerController")]
-    public class PlayerController : InputController
+[CreateAssetMenu(fileName = "PlayerController", menuName = "InputController/PlayerController")]
+public class PlayerController : InputController
+{
+    public override bool RetrieveJumpInput()
     {
-        public override bool RetrieveJumpInput()
-        {
-            return Input.GetButtonDown("Jump");
-        }
-
-        public override float RetrieveMoveInput()
-        {
-            return Input.GetAxisRaw("Horizontal");
-        }
+        return Input.GetButtonDown("Jump");
     }
+
+    public override float RetrieveMoveInput()
+    {
+        return Input.GetAxisRaw("Horizontal");
+    }
+
+    public override float RetrieveMoveInput2()
+    {
+        return Input.GetAxisRaw("Vertical");
+    }
+}

@@ -14,7 +14,8 @@ public class Move : MonoBehaviour
     public Vector2 _velocity, _desiredVelocity;
     public Rigidbody2D _body;
     private Ground _ground;
-    public PlatformVelocity platform;
+    public PlatformVelocity _platform;
+    public Jump _jump;
 
     private float _maxSpeedChange, _acceleration;
     private bool _onGround;
@@ -24,6 +25,7 @@ public class Move : MonoBehaviour
     {
         _body = GetComponent<Rigidbody2D>();
         _ground = GetComponent<Ground>();
+        _jump = GetComponent<Jump>();
         _controller = GetComponent<Controller>();
     }
 
@@ -35,12 +37,10 @@ public class Move : MonoBehaviour
         {
             _onPlatform = false;
         }
-
     }
 
     void FixedUpdate()
     {
-
         _desiredVelocity = new Vector2(_direction.x, 0f) * Mathf.Max(_maxSpeed - _ground.Friction, 0f);
         _onGround = _ground.OnGround;
         _velocity = _body.velocity;
@@ -50,7 +50,7 @@ public class Move : MonoBehaviour
 
         if (_onPlatform)
         {
-            _velocity = platform._velocity;
+            _velocity = _platform._velocity;
 
             if (_direction.x != 0)
             {
@@ -61,7 +61,27 @@ public class Move : MonoBehaviour
         {
             _velocity = _body.velocity;
 
-            _velocity.x = Mathf.MoveTowards(_velocity.x, _desiredVelocity.x, _maxSpeedChange);
+            if (_jump._onGround && !_controller.input.RetrieveJumpInput() && _direction.x == 0)
+            {
+                _desiredVelocity = new Vector2(_direction.x, 0f) * Mathf.Max(_maxSpeed/2 - _ground.Friction, 0f);
+                _velocity.x = Mathf.MoveTowards(_velocity.x, _desiredVelocity.x, _maxSpeedChange);
+                if (_jump._wallGrab)
+                {
+                    _desiredVelocity = Vector2.zero;
+                }
+            } else
+            {
+                _velocity.x = Mathf.MoveTowards(_velocity.x, _desiredVelocity.x, _maxSpeedChange);
+                if (_jump._wallGrab && !_jump._wallJumping)                
+                {
+                    _velocity = Vector2.zero;
+                    _desiredVelocity = Vector2.zero;
+                }
+                else if (_jump._wallGrab && _jump._wallJumping)
+                {
+                    _jump.WallJumpAction();
+                }
+            }
 
         }
 
@@ -74,7 +94,7 @@ public class Move : MonoBehaviour
         if (collision.gameObject.tag == "Platform" && collision != null)
         {
             Debug.Log("I have Entered");
-            platform = collision.gameObject.GetComponent<PlatformVelocity>();
+            _platform = collision.gameObject.GetComponent<PlatformVelocity>();
             _onPlatform = true;
         }
     }
