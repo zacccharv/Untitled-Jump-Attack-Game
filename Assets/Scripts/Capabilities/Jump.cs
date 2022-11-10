@@ -47,6 +47,7 @@ public class Jump : MonoBehaviour
         _controller = GetComponent<Controller>();
         _animator = GetComponent<Animator>();
 
+        _wallSliding = false;
         _defaultGravityScale = 1f;
     }
 
@@ -60,31 +61,7 @@ public class Jump : MonoBehaviour
         _onGround = _ground.OnGround;
         _velocity = _body.velocity;
 
-        if (_onGround && !_wallSliding)
-        {
-            _jumpPhase = 0;
-        }
-        if (_desiredJump)
-        {
-            _desiredJump = false;
-            JumpAction();
-        }
-        if (_body.velocity.y > 0 && !_wallSliding && Input.GetButton("Jump"))
-        {
-            _body.gravityScale = _upwardMovementMultiplier;
-        }
-        if (_body.velocity.y < 0 && !_wallSliding || (!Input.GetButton("Jump") && _touchingBottom == false))
-        {
-            _body.gravityScale = _downwardMovementMultiplier + .5f;
-        }
-        else if (_body.velocity.y == 0)
-        {
-            _body.gravityScale = _defaultGravityScale;
-        }
-        else if (_jumpPhase == 1 && _touchingBottom == false)
-        {
-            _body.gravityScale = _doubleJumpMultiplier + .5f;
-        }
+        JumpActionCheck()
 
         WallHitCheck();
 
@@ -102,12 +79,11 @@ public class Jump : MonoBehaviour
             // This has to go last
             _body.velocity = _velocity;
         }
-
     }
 
     public void JumpAction()
     {
-        if ((_onGround || _jumpPhase < _maxAirJumps) && _wallSliding == false)
+        if ((_touchingBottom || _jumpPhase < _maxAirJumps))
         {
             _jumpPhase += 1;
 
@@ -126,25 +102,41 @@ public class Jump : MonoBehaviour
             }
             _velocity.y += _jumpSpeed;
         }
-
-        if (_wallSliding && _body.velocity.y <= 0)
-        {
-            _animator.SetTrigger("Jumped");
-            _animator.SetBool("Falling", false);
-            _body.gravityScale = _downwardMovementMultiplier + .5f;
-
-            if (_wallSliding)
-            {
-                _wallJumping = true;
-                Debug.Log("I jumped off a wall");
-            }
-        }
     }
 
-/*    private void JumpActionCheck()
-    {
+    private void JumpActionCheck()
+        {
+            if (_touchingBottom)
+            {
+                _jumpPhase = 0;
+            }
 
-    }*/
+            if (_desiredJump)
+            {
+                _desiredJump = false;
+                JumpAction();
+            }
+
+            //State check if going up down or on ground//
+            if (_body.velocity.y > 0 && !_wallSliding && Input.GetButton("Jump"))
+            {
+                _body.gravityScale = _upwardMovementMultiplier;
+            }
+            else if (_body.velocity.y < 0 && !_wallSliding || (!Input.GetButton("Jump") && _touchingBottom == false))
+            {
+                _body.gravityScale = _downwardMovementMultiplier + .5f;
+            }
+            else if (_body.velocity.y == 0)
+            {
+                _body.gravityScale = _defaultGravityScale;
+            }
+
+            // 2nd Jump check
+            if (_touchingBottom == false && _controller.input.RetrieveJumpInput())
+            {
+                _body.gravityScale = _doubleJumpMultiplier + .5f;
+            }
+        }
 
     private void WallHitCheck()
     {
@@ -174,12 +166,15 @@ public class Jump : MonoBehaviour
         {
             _leftWallHit = false;
             _rightWallhit = false;
+
+            // use child to draw ray from
             Debug.DrawRay(transform.position, transform.TransformDirection(Vector2.right) * 1000, Color.white);
             Debug.DrawRay(transform.position, transform.TransformDirection(Vector2.left) * 1000, Color.white);
         }
         if (DownCast)
         {
             _touchingBottom = true;
+            // use child to draw ray from
         }
         else
         {
@@ -197,10 +192,10 @@ public class Jump : MonoBehaviour
         {
             _wallSliding = false;
         }
+        // If pushing into wall decreased slide. //
         if (_wallSliding && (_controller.input.RetrieveMoveInput() != 0 && _controller.input.RetrieveMoveInput2() != 0) && _body.velocity.y < 0)
         {
             _body.gravityScale = _downwardMovementMultiplier / 10;
-            _jumpPhase = 1;
         } 
         else if (_wallSliding && _controller.input.RetrieveMoveInput() == 0 && _controller.input.RetrieveMoveInput2() == 0 && !_wallGrab)
         {
@@ -225,7 +220,6 @@ public class Jump : MonoBehaviour
         {
             _wallGrab = false;
         }
-
         if (_wallGrab && !_controller.input.RetrieveJumpInput())
         {
             _body.gravityScale = 0;
@@ -253,6 +247,8 @@ public class Jump : MonoBehaviour
 
     public void WallJumpAction()
     {
+        _jumpPhase += 1;
+
         float _direction = 0;
 
         if (_rightWallhit)
@@ -266,18 +262,15 @@ public class Jump : MonoBehaviour
 
         _body.gravityScale = _downwardMovementMultiplier + .5f;
 
-        if (_rightWallhit || _leftWallHit)
+        if (_wallSliding)
         {
             _wallJumping = false;
         }
 
         Vector2 _wallJumpVelocity = new Vector2(_wallJumpVelocityX * _direction, _wallJumpVelocityY + (_controller.input.RetrieveMoveInput2() * 3));
 
-/*        if (_wallGrab)
-        {
-            _wallJumpVelocity = new Vector2((_wallJumpVelocityX * 2) * _direction, _wallJumpVelocityY + (_controller.input.RetrieveMoveInput2() * 3));
-        }*/
         _body.velocity = _wallJumpVelocity;
+        Debug.Log("I jumped off a wall");
     }
 
     private void NotWallJumping()
