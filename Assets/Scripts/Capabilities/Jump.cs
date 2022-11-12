@@ -4,43 +4,34 @@ using ZaccCharv;
 [RequireComponent(typeof(Controller))]
 public class Jump : MonoBehaviour
 {
-    #region Jump Class Only Vars
+    #region Jumping EarlyJump Falling FallClamp Vars
 
-    [SerializeField, Range(0f, 10f)] private float _jumpHeight = 3f;
-    [SerializeField, Range(0, 5)] public int _maxAirJumps = 0;
-    [SerializeField, Range(0f, 5f)] public float _downwardMovementMultiplier = 3f;
-    [SerializeField, Range(0f, 5f)] private float _upwardMovementMultiplier = 1.7f;
-    [SerializeField] private float _fallClamp;
+        [SerializeField, Range(0f, 10f)] private float _jumpHeight = 3f;
+        [SerializeField, Range(0, 5)] public int _maxAirJumps = 0;
+        [SerializeField, Range(0f, 5f)] public float _downwardMovementMultiplier = 3f;
+        [SerializeField, Range(0f, 5f)] private float _upwardMovementMultiplier = 1.7f;
+        [SerializeField, Range(0f, 5f)] public float _doubleJumpMultiplier = 3f;
+        [SerializeField] private Controller _controller = null;
+        [SerializeField] private float _fallClamp;
+        private CharCollisions _charCollisions;
+        public Transform _rayCenter;
+        private Animator _animator;
+        private Rigidbody2D _body;
+        public Vector2 _velocity;
 
-    private Animator _animator;
-    private Rigidbody2D _body;
-    private Ground _ground;
-    public Vector2 _velocity;
-
-    [SerializeField] private Controller _controller = null;
-
-    private float _defaultGravityScale, _jumpSpeed;
-    private bool _touchingBottom;
+        private float _defaultGravityScale, _jumpSpeed;
+        private bool _touchingBottom;
+        public bool _desiredJump, _earlyJump;
+        public int _jumpPhase;
 
     #endregion
-
-    public bool _desiredJump, _onGround, _earlyJump;
-
-    public int _jumpPhase;
-
-    [SerializeField, Range(0f, 5f)] public float _doubleJumpMultiplier = 3f;
 
     #region Wall Jumping and Sliding Vars
-
-    private bool _leftWallHit, _rightWallhit;
-    private bool _wallSliding;
-    [HideInInspector] public bool _wallJumping;
-    public float _wallJumpTime;
-    [HideInInspector] public bool _wallGrab;
+        private bool _wallSliding;
+        [HideInInspector] public bool _wallJumping;
+        [HideInInspector] public bool _wallGrab;
 
     #endregion
-
-    public Transform _rayCenter;
 
     void Start()
     {
@@ -48,20 +39,20 @@ public class Jump : MonoBehaviour
         _ground = GetComponent<Ground>();
         _controller = GetComponent<Controller>();
         _animator = GetComponent<Animator>();
+        _charCollisions = AddComponent<CharCollisions>();
 
-        _wallSliding = false;
         _defaultGravityScale = 1f;
     }
 
     void Update()
     {
         _desiredJump |= _controller.input.RetrieveJumpInput();
-        WallFloorHitCheck(); 
+        _charCollisions.WallFloorHitCheck(); 
+        _rayCenter = _charCollisions._rayCenter;
     }
 
     private void FixedUpdate()
     {
-        _onGround = _ground.OnGround;
         _velocity = _body.velocity;
 
         JumpActionCheck();
@@ -106,7 +97,7 @@ public class Jump : MonoBehaviour
 
             float _wallHitDirection = 0;
 
-            if (_rightWallhit)
+            if (_charCollisions.rightWallhit)
             {
                 _wallHitDirection = -1;
                 if (_wallGrab)
@@ -114,7 +105,7 @@ public class Jump : MonoBehaviour
                     _wallHitDirection = 1 * -GetComponent<CharacterAnimator>().FlipDirection;
                 }
             }
-            else if (_leftWallHit)
+            else if (_charCollisions._leftWallHit)
             {
                 _wallHitDirection = 1;
                 if (_wallGrab)
@@ -137,11 +128,11 @@ public class Jump : MonoBehaviour
                 _jumpSpeed += Mathf.Abs(_body.velocity.y/4);
             }
 
-            if ((_rightWallhit && _wallHitDirection == 1) || (_leftWallHit && _wallHitDirection == -1))
+            if ((_charCollisions._rightWallhit && _wallHitDirection == 1) || (_charCollisions._leftWallHit && _wallHitDirection == -1))
             {
                 _velocity.x += 10 * _wallHitDirection;
             }
-            else if ((_rightWallhit && _wallHitDirection == -1) || (_leftWallHit && _wallHitDirection == 1))
+            else if ((_charCollisions._rightWallhit && _wallHitDirection == -1) || (_charCollisions._leftWallHit && _wallHitDirection == 1))
             {
                 _velocity.x += 2f * _wallHitDirection;
             }
@@ -149,7 +140,6 @@ public class Jump : MonoBehaviour
             _velocity.y += _jumpSpeed;
         }
     }
-
     private void JumpActionCheck()
     {
         if (_touchingBottom)
@@ -201,60 +191,9 @@ public class Jump : MonoBehaviour
         }
     }
 
-    private void WallFloorHitCheck()
-    {
-        // Bit shift the index of the layer (7) to get a bit mask
-        int layerMask = 1 << 7;
-
-        // This would cast rays only against colliders in layer 7.
-
-        var RightCast = Physics2D.Raycast(transform.position, transform.TransformDirection(Vector2.right), .4f, layerMask);
-        var LeftCast = Physics2D.Raycast(transform.position, transform.TransformDirection(Vector2.left), .4f, layerMask);
-        var UpCast = Physics2D.Raycast(transform.position, transform.TransformDirection(Vector2.up), .5f, layerMask);
-        var DownCast = Physics2D.BoxCast(transform.position, new Vector2(.4f,.2f), 0f, transform.TransformDirection(Vector2.down), 0, layerMask);
-        var DownCast2 = Physics2D.BoxCast(transform.position, new Vector2(.4f, .25f), 0f, transform.TransformDirection(Vector2.down), 0, layerMask);
-
-        if (RightCast && (!UpCast && !DownCast))
-        {
-            Debug.DrawRay(_rayCenter.position + new Vector3(0, 1, 0), transform.TransformDirection(Vector2.right), Color.yellow);
-
-            _rightWallhit = true;
-        }
-        else if (LeftCast && (!UpCast && !DownCast))
-        {
-            Debug.DrawRay(_rayCenter.position + new Vector3(0,1,0), transform.TransformDirection(Vector2.left), Color.blue);
-
-            _leftWallHit = true;
-        }
-        else
-        {
-            _leftWallHit = false;
-            _rightWallhit = false;
-
-            // use child to draw ray from
-            Debug.DrawRay(_rayCenter.position, transform.TransformDirection(Vector2.right) * 1000, Color.white);
-            Debug.DrawRay(_rayCenter.position, transform.TransformDirection(Vector2.left) * 1000, Color.white);
-        }
-        if (DownCast)
-        {
-            _touchingBottom = true;
-            // use child to draw ray from
-            Debug.DrawRay(_rayCenter.position, transform.TransformDirection(new Vector2(0, -.2f)), Color.yellow);
-        }
-        else
-        {
-            _touchingBottom = false;
-        }
-
-        if (!DownCast && DownCast2)
-        {
-            _earlyJump = true;
-        }
-    }
-
     private void WallSlidingCheck()
     {
-        if (_rightWallhit || _leftWallHit)
+        if (_charCollisions._charCollisions._rightWallhit || _charCollisions._charCollisions._leftWallHit)
         {
             _wallSliding = true;
         }
@@ -281,7 +220,6 @@ public class Jump : MonoBehaviour
         }
         WallGrabCheck(); 
     }
-
     private void WallGrabCheck()
     {
         if (_wallSliding)
@@ -312,7 +250,6 @@ public class Jump : MonoBehaviour
             _body.gravityScale = _upwardMovementMultiplier + .5f;
         }
     }
-
     private void NotWallJumping()
     {
         Debug.Log("not wall jumping");
