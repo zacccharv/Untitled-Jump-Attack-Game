@@ -169,8 +169,9 @@ public class Jump : MonoBehaviour
         {
             _body.gravityScale = _downwardMovementMultiplier + .5f;
 
-            if (_body.velocity.y < 0 && !Input.GetButtonDown("Jump"))
+            if (_body.velocity.y < 0 && !_desiredJump)
             {
+                _desiredJump = false;
                 _velocity.y = Mathf.Max(_fallClamp, _body.velocity.y);  
             }
             Debug.Log("falling");
