@@ -72,6 +72,7 @@ public class Move : MonoBehaviour
             } else
             {
                 _velocity.x = Mathf.MoveTowards(_velocity.x, _desiredVelocity.x, _maxSpeedChange);
+
                 if (_jump._wallGrab && !_jump._wallJumping)                
                 {
                     _velocity = Vector2.zero;
@@ -79,7 +80,7 @@ public class Move : MonoBehaviour
                 }
                 else if (_jump._wallGrab && _jump._wallJumping)
                 {
-                    _jump.WallJumpAction();
+                    _maxAirAcceleration = _maxAcceleration/1.25f;
                 }
             }
 

@@ -19,6 +19,7 @@ namespace ZaccCharv
         private Controller _controller;
         private SpriteRenderer sr;
         private Vector2 _direction;
+        public int FlipDirection { get; set; }
 
         // Start is called before the first frame update
         void Start()
@@ -44,12 +45,14 @@ namespace ZaccCharv
                 transform.localScale = new Vector3(-1.79f, 1.79f, 0);
                 buttonCheck = true;
                 sr.flipX = true;
+                FlipDirection = -1;
             }
             if (_direction.x == 1)
             {
                 buttonCheck = true;
                 transform.localScale = new Vector3(1.79f, 1.79f, 0);
                 sr.flipX = false;
+                FlipDirection = 1;
             }
             if (_direction.x == 0)
             {
