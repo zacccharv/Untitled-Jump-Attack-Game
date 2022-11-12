@@ -18,7 +18,6 @@ public class Jump : MonoBehaviour
         private Animator _animator;
         private Rigidbody2D _body;
         public Vector2 _velocity;
-
         private float _defaultGravityScale, _jumpSpeed;
         private bool _touchingBottom;
         public bool _desiredJump, _earlyJump;
@@ -27,6 +26,7 @@ public class Jump : MonoBehaviour
     #endregion
 
     #region Wall Jumping and Sliding Vars
+
         private bool _wallSliding;
         [HideInInspector] public bool _wallJumping;
         [HideInInspector] public bool _wallGrab;
@@ -50,7 +50,6 @@ public class Jump : MonoBehaviour
         _charCollisions.WallFloorHitCheck(); 
         _rayCenter = _charCollisions._rayCenter;
     }
-
     private void FixedUpdate()
     {
         _velocity = _body.velocity;
@@ -63,7 +62,6 @@ public class Jump : MonoBehaviour
 
         // This has to go last
         _body.velocity = _velocity;
-
     }
 
     public void JumpAction()
@@ -162,7 +160,6 @@ public class Jump : MonoBehaviour
             JumpAction();
             NotWallJumping();
         }
-
         //State check if going up down or on ground//
         if (Input.GetButton("Jump") && _body.velocity.y > 0 && !_wallSliding)
         {
@@ -190,7 +187,6 @@ public class Jump : MonoBehaviour
             _body.gravityScale = _doubleJumpMultiplier + .5f;
         }
     }
-
     private void WallSlidingCheck()
     {
         if (_charCollisions._charCollisions._rightWallhit || _charCollisions._charCollisions._leftWallHit)
