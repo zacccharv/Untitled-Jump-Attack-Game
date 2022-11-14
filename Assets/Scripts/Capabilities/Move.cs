@@ -15,6 +15,7 @@ public class Move : MonoBehaviour
     public Rigidbody2D _body;
     private Ground _ground;
     public PlatformVelocity _platform;
+    public CharCollisions _charCollisions;
     public Jump _jump;
 
     private float _maxSpeedChange, _acceleration;
@@ -25,6 +26,7 @@ public class Move : MonoBehaviour
     {
         _body = GetComponent<Rigidbody2D>();
         _ground = GetComponent<Ground>();
+        _charCollisions = GetComponent<CharCollisions>();
         _jump = GetComponent<Jump>();
         _controller = GetComponent<Controller>();
     }
@@ -61,7 +63,7 @@ public class Move : MonoBehaviour
         {
             _velocity = _body.velocity;
 
-            if (_jump._onGround && !_controller.input.RetrieveJumpInput() && _direction.x == 0)
+            if (_charCollisions._touchingBottom && !_controller.input.RetrieveJumpInput() && _direction.x == 0)
             {
                 _desiredVelocity = new Vector2(_direction.x, 0f) * Mathf.Max(_maxSpeed/2 - _ground.Friction, 0f);
                 _velocity.x = Mathf.MoveTowards(_velocity.x, _desiredVelocity.x, _maxSpeedChange);

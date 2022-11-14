@@ -4,23 +4,25 @@ using UnityEngine;
 using UnityEngine.SceneManagement;
 using UnityEngine.UI;
 
-namespace ZaccCharv;
-public class CharacterStaminaBar : MonoBehaviour
+namespace ZaccCharv
 {
-    public GameObject character;
-    [SerializeField] private Slider slider;
-
-    public int _current;
-
-    void Start()
+    public class CharacterStaminaBar : MonoBehaviour
     {
-        slider = GetComponent<Slider>();
-    }
+        public GameObject character;
+        [SerializeField] private Slider slider;
 
-    // Update is called once per frame
-    void Update()
-    {
-        _current = character.gameObject.GetComponent<CharacterStatusBar>().current;
-        slider.value = (float)_current/100;
+        public int _current;
+
+        void Start()
+        {
+            slider = GetComponent<Slider>();
+        }
+
+        // Update is called once per frame
+        void Update()
+        {
+            _current = character.gameObject.GetComponent<CharacterStatusBar>().current;
+            slider.value = (float)_current / 100;
+        }
     }
 }

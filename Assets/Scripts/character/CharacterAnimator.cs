@@ -3,99 +3,100 @@ using System.Collections;
 using System.Collections.Generic;
 using UnityEngine;
 
-namespace ZaccCharv;
-
-public class CharacterAnimator : MonoBehaviour
+namespace ZaccCharv
 {
-
-    private Rigidbody2D body;
-    private Animator animator;
-    private Ground ground;
-    private Jump jump;
-    private Move move;
-
-    [SerializeField] private bool buttonCheck;
-
-    private Controller _controller;
-    private SpriteRenderer sr;
-    private Vector2 _direction;
-    public int FlipDirection { get; set; }
-
-    // Start is called before the first frame update
-    void Start()
+    public class CharacterAnimator : MonoBehaviour
     {
-        body = GetComponent<Rigidbody2D>();
-        animator = GetComponent<Animator>();
-        _controller = GetComponent<Controller>();
-        ground = GetComponent<Ground>();
-        jump = GetComponent<Jump>();
-        move = GetComponent<Move>();
 
-        sr = GetComponent<SpriteRenderer>();
-    }
+        private Rigidbody2D body;
+        private Animator animator;
+        private Ground ground;
+        private Jump jump;
+        private Move move;
 
+        [SerializeField] private bool buttonCheck;
 
-    // Update is called once per frame
-    void Update()
-    {
-        _direction.x = _controller.input.RetrieveMoveInput();
+        private Controller _controller;
+        private SpriteRenderer sr;
+        private Vector2 _direction;
+        public int FlipDirection { get; set; }
 
-        if (_direction.x == -1)
+        // Start is called before the first frame update
+        void Start()
         {
-            transform.localScale = new Vector3(-1.79f, 1.79f, 0);
-            buttonCheck = true;
-            sr.flipX = true;
-            FlipDirection = -1;
-        }
-        if (_direction.x == 1)
-        {
-            buttonCheck = true;
-            transform.localScale = new Vector3(1.79f, 1.79f, 0);
-            sr.flipX = false;
-            FlipDirection = 1;
-        }
-        if (_direction.x == 0)
-        {
-            buttonCheck = false;
+            body = GetComponent<Rigidbody2D>();
+            animator = GetComponent<Animator>();
+            _controller = GetComponent<Controller>();
+            ground = GetComponent<Ground>();
+            jump = GetComponent<Jump>();
+            move = GetComponent<Move>();
+
+            sr = GetComponent<SpriteRenderer>();
         }
 
-        if (animator != null)
+
+        // Update is called once per frame
+        void Update()
         {
-            // idling check
-            if (ground.OnGround && Mathf.Abs(body.velocity.x) < 0.1f || move._onPlatform && buttonCheck == false)
+            _direction.x = _controller.input.RetrieveMoveInput();
+
+            if (_direction.x == -1)
             {
-                animator.SetBool("Moving", false);
-                animator.SetBool("Falling", false);
-                animator.SetBool("Idling", true);
+                transform.localScale = new Vector3(-1.79f, 1.79f, 0);
+                buttonCheck = true;
+                sr.flipX = true;
+                FlipDirection = -1;
+            }
+            if (_direction.x == 1)
+            {
+                buttonCheck = true;
+                transform.localScale = new Vector3(1.79f, 1.79f, 0);
+                sr.flipX = false;
+                FlipDirection = 1;
+            }
+            if (_direction.x == 0)
+            {
+                buttonCheck = false;
             }
 
-            // running check
-            if (ground.OnGround && Mathf.Abs(body.velocity.x) > 0.1 && buttonCheck)
+            if (animator != null)
             {
-                animator.SetBool("Moving", true);
-                animator.SetBool("Idling", false);
-                animator.SetBool("Falling", false);
-            }
-            // just jumped check
-            if (_controller.input.RetrieveJumpInput() && jump._jumpPhase < jump._maxAirJumps)
-            {
-                animator.SetBool("Moving", false);
-            }
+                // idling check
+                if (ground.OnGround && Mathf.Abs(body.velocity.x) < 0.1f || move._onPlatform && buttonCheck == false)
+                {
+                    animator.SetBool("Moving", false);
+                    animator.SetBool("Falling", false);
+                    animator.SetBool("Idling", true);
+                }
 
-            // Floating Check
-            if (!ground.OnGround && body.velocity.y > 0)
-            {
-                animator.SetBool("Floating", true);
+                // running check
+                if (ground.OnGround && Mathf.Abs(body.velocity.x) > 0.1 && buttonCheck)
+                {
+                    animator.SetBool("Moving", true);
+                    animator.SetBool("Idling", false);
+                    animator.SetBool("Falling", false);
+                }
+                // just jumped check
+                if (_controller.input.RetrieveJumpInput() && jump._jumpPhase < jump._maxAirJumps)
+                {
+                    animator.SetBool("Moving", false);
+                }
+
+                // Floating Check
+                if (!ground.OnGround && body.velocity.y > 0)
+                {
+                    animator.SetBool("Floating", true);
+                }
+
+                //Falling Check also works if fall of ledge
+                if (!ground.OnGround && body.velocity.y < 0)
+                {
+                    animator.SetBool("Floating", false);
+                    animator.SetBool("Falling", true);
+                }
+
+
             }
-
-            //Falling Check also works if fall of ledge
-            if (!ground.OnGround && body.velocity.y < 0)
-            {
-                animator.SetBool("Floating", false);
-                animator.SetBool("Falling", true);
-            }
-
-
         }
     }
 }

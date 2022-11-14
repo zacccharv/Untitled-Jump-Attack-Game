@@ -32,9 +32,6 @@ namespace ZaccCharv
             float targetX = Mathf.Clamp(characterPosition.position.x, levelBoundsBottom.x + cameraExtentsX, levelBoundsTop.x);
             float targetY = Mathf.Clamp(characterPosition.position.y, levelBoundsBottom.y + cameraExtentsY, levelBoundsTop.y);
 
-
-            Debug.DrawLine(levelBoundsBottom, levelBoundsTop);
-
             target = new Vector3 (targetX, targetY, 0);
             transform.position = Vector3.Lerp(transform.position, target, Time.deltaTime);
         }
