@@ -35,10 +35,6 @@ namespace ZaccCharv
             {
                 _leftWallHit = false;
                 _rightWallhit = false;
-
-                // use child to draw ray from
-                Debug.DrawRay(_rayCenter.position, transform.TransformDirection(Vector2.right) * 1000, Color.white);
-                Debug.DrawRay(_rayCenter.position, transform.TransformDirection(Vector2.left) * 1000, Color.white);
             }
             if (DownCast)
             {

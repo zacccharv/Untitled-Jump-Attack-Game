@@ -46,11 +46,13 @@ namespace ZaccCharv
         void Update()
         {
             _desiredJump |= _controller.input.RetrieveJumpInput();
-            _charCollisions.CharCollisionCheck();
+
         }
         private void FixedUpdate()
         {
             _velocity = _body.velocity;
+
+            _charCollisions.CharCollisionCheck();
 
             JumpActionCheck();
 
@@ -106,6 +108,8 @@ namespace ZaccCharv
                 _animator.SetBool("Falling", false);
 
                 _jumpSpeed = Mathf.Sqrt(-2f * Physics2D.gravity.y * _jumpHeight);
+                var FlipDir = _wallHitDirection + gameObject.GetComponent<CharacterAnimator>().FlipDirection;
+                var InputAxis = (Input.GetAxis("Horizontal") * 2);
 
                 if (_velocity.y > 0f)
                 {
@@ -118,29 +122,25 @@ namespace ZaccCharv
 
                 if (_charCollisions._leftWallHit && gameObject.GetComponent<CharacterAnimator>().FlipDirection == -1)
                 {
-                    _velocity.x += 10 * _wallHitDirection + gameObject.GetComponent<CharacterAnimator>().FlipDirection;
+                    _velocity.x -= 5 * FlipDir + InputAxis;
                 }
                 if (_charCollisions._leftWallHit && gameObject.GetComponent<CharacterAnimator>().FlipDirection == 1)
                 {
-                    _velocity.x += 0 * _wallHitDirection + gameObject.GetComponent<CharacterAnimator>().FlipDirection;
+                    _velocity.x += 6 * FlipDir + InputAxis;
                 }
                 else if (_charCollisions._rightWallhit && gameObject.GetComponent<CharacterAnimator>().FlipDirection == -1)
                 {
-                    _velocity.x += 10 * _wallHitDirection + gameObject.GetComponent<CharacterAnimator>().FlipDirection;
+                    _velocity.x += 6 * FlipDir + InputAxis;
                 }
                 else if (_charCollisions._rightWallhit && gameObject.GetComponent<CharacterAnimator>().FlipDirection == 1)
                 {
-                    _velocity.x += 0 * _wallHitDirection + gameObject.GetComponent<CharacterAnimator>().FlipDirection;
+                    _velocity.x -= 5 * FlipDir + InputAxis;
                 }
 
                 _wallJumping = true;
                 _velocity.y += _jumpSpeed;
-                _velocity.x += (Input.GetAxis("Horizontal") * 5 * _wallHitDirection);
 
-                if (true)
-                {
-
-                }
+                Debug.Log(Input.GetAxis("Horizontal") * 5);
                 }
             }
         
