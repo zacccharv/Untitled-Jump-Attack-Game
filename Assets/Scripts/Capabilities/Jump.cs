@@ -15,7 +15,9 @@ namespace ZaccCharv
         [SerializeField, Range(0f, 5f)] public float _doubleJumpMultiplier = 3f;
         [SerializeField] private Controller _controller = null;
         [SerializeField] private float _fallClamp;
-        private CharCollisions _charCollisions;
+
+        // See if creating new class solves cluttering scripts
+        private CharCollisions _charCollisions = new CharCollisions();
         private Animator _animator;
         private Rigidbody2D _body;
         public Vector2 _velocity;
@@ -38,7 +40,7 @@ namespace ZaccCharv
             _body = GetComponent<Rigidbody2D>();
             _controller = GetComponent<Controller>();
             _animator = GetComponent<Animator>();
-            _charCollisions = GetComponent<CharCollisions>();
+            _charCollisions._rayCenter = GetComponentInChildren<Transform>().position;
 
             _defaultGravityScale = 1f;
         }
@@ -46,7 +48,6 @@ namespace ZaccCharv
         void Update()
         {
             _desiredJump |= _controller.input.RetrieveJumpInput();
-
         }
         private void FixedUpdate()
         {

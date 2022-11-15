@@ -4,9 +4,11 @@ namespace ZaccCharv
 {
     public class CharCollisions : MonoBehaviour
     {
-        public bool _touchingBottom, _earlyJump;
-        public bool _leftWallHit, _rightWallhit;
+        private bool _touchingBottom, _earlyJump;
+        private bool _leftWallHit, _rightWallhit;
         public Transform _rayCenter;
+
+        private string _string = "something somewhere sometime";
 
         public void CharCollisionCheck()
         {
