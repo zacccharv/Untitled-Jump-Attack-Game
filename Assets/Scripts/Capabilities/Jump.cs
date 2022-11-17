@@ -17,7 +17,8 @@ namespace ZaccCharv
         [SerializeField] private float _fallClamp;
 
         // See if creating new class solves cluttering scripts
-        private CharCollisions _charCollisions = new CharCollisions();
+        private CharCollisions _charCollisions;
+        public Transform _rayCenter;
         private Animator _animator;
         private Rigidbody2D _body;
         public Vector2 _velocity;
@@ -40,7 +41,9 @@ namespace ZaccCharv
             _body = GetComponent<Rigidbody2D>();
             _controller = GetComponent<Controller>();
             _animator = GetComponent<Animator>();
-            _charCollisions._rayCenter = GetComponentInChildren<Transform>().position;
+            _charCollisions = AddComponent<CharacterCollision>();
+
+            _charCollisions._rayCenter = _rayCenter;
 
             _defaultGravityScale = 1f;
         }

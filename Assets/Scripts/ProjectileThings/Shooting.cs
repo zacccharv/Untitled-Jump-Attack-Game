@@ -30,8 +30,7 @@ namespace ZaccCharv
 
         void Shoot()
         {
-            newProjectile = Instantiate(projectile, transform.position, Quaternion.identity);
-            newProjectile.transform.SetParent(parent, true);
+            newProjectile = Instantiate(projectile, transform.position, Quaternion.identity, parent);
         }
     }
 }
