@@ -7,10 +7,9 @@ namespace ZaccCharv
     public class Drips : MonoBehaviour 
     {
         public float _offsetTime;
-        public float _repeatTime;
+        private float _repeatTime = .3f;
         public GameObject _prefab;
-        private GameObject _newDrip;
-
+        int num = 0;
         private void Start() 
         {
             InvokeRepeating("DripDrop", _offsetTime, _repeatTime);
@@ -18,7 +17,23 @@ namespace ZaccCharv
 
         void DripDrop() 
         {
-            _newDrip = Instantiate(_prefab, transform.position, Quaternion.Identity, this.gameObject);
+            num++;
+            int randNum = Mathf.RoundToInt(Random.Range(0, 2));
+
+            if (num % 12 < 7)
+            {
+                if (num % 12 >= 3)
+                {
+                    if (randNum == 0)
+                    {
+                        Instantiate(_prefab, transform.position, Quaternion.identity, gameObject.transform);
+                    }
+                }
+                else if (num % 12 == 0 || num % 12 == 2)
+                {
+                    Instantiate(_prefab, transform.position, Quaternion.identity, gameObject.transform);
+                }
+            }
         }
 
     }

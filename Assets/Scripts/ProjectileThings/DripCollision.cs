@@ -7,7 +7,7 @@ public class DripCollision : MonoBehaviour
 {
     private Rigidbody2D rb;
     public AnimationCurve curve;
-    public float curveTimeStart;
+    private float curveTimeStart;
 
     void Start()
     {
@@ -17,10 +17,12 @@ public class DripCollision : MonoBehaviour
     void Update()
     {
         rb.velocity = new Vector2(0, curve.Evaluate(Time.time- curveTimeStart) * -5);
+    
     }
+
     void OnCollisionEnter2D(Collision2D other)
     {
-        if (other.gameObject.layer == 7)
+        if (other.gameObject.layer == 11)
         {
             Destroy(gameObject);
         }

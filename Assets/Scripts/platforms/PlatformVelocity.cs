@@ -5,8 +5,6 @@ using UnityEngine;
 
 public class PlatformVelocity : MonoBehaviour
 {
-    public GameObject Rect;
-
     public Transform start;
     public Transform end;
 
@@ -39,7 +37,7 @@ public class PlatformVelocity : MonoBehaviour
 
             while (remainingDistance > 0 && forward == true)
             {
-                Rect.transform.position = Vector3.Lerp(start.position, end.position, Curve.Evaluate(1 - (remainingDistance / distance)));
+                transform.position = Vector3.Lerp(start.position, end.position, Curve.Evaluate(1 - (remainingDistance / distance)));
                 remainingDistance -= LerpSpeed * Time.deltaTime;
                 yield return new WaitForFixedUpdate();
             }
@@ -49,7 +47,7 @@ public class PlatformVelocity : MonoBehaviour
 
             while (remainingDistance > 0 && forward == false)
             {
-                Rect.transform.position = Vector3.Lerp(end.position, start.position, Curve.Evaluate(1 - (remainingDistance / distance)));
+                transform.position = Vector3.Lerp(end.position, start.position, Curve.Evaluate(1 - (remainingDistance / distance)));
                 remainingDistance -= LerpSpeed * Time.deltaTime;
                 yield return new WaitForFixedUpdate();
             }
