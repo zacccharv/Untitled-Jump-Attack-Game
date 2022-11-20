@@ -17,10 +17,10 @@ public class Move : MonoBehaviour
     public PlatformVelocity _platform;
     public CharCollisions _charCollisions;
     public Jump _jump;
+    public CharCollisions _charCollions;
 
-    private float _maxSpeedChange, _acceleration;
-    private bool _onGround;
-    public bool _onPlatform;
+    private float _maxSpeedChange, _acceleration, _previousVelocity;
+    private bool _onGround, _onPlatform, _landed;
 
     void Start()
     {
@@ -46,6 +46,7 @@ public class Move : MonoBehaviour
         _desiredVelocity = new Vector2(_direction.x, 0f) * Mathf.Max(_maxSpeed - _ground.Friction, 0f);
         _onGround = _ground.OnGround;
         _velocity = _body.velocity;
+        _previousVelocity = _body.velocity.x;
 
         _acceleration = _onGround ? _maxAcceleration : _maxAirAcceleration;
         _maxSpeedChange = _acceleration * Time.deltaTime;
@@ -70,6 +71,11 @@ public class Move : MonoBehaviour
                 if (_jump._wallGrab)
                 {
                     _desiredVelocity = Vector2.zero;
+                }
+                if (_landed)
+                {
+                    _landed = false;
+                    _velocity.x = _previousVelocity;
                 }
             } else
             {
@@ -96,9 +102,12 @@ public class Move : MonoBehaviour
 
         if (collision.gameObject.tag == "Platform" && collision != null)
         {
-            Debug.Log("I have Entered");
             _platform = collision.gameObject.GetComponent<PlatformVelocity>();
             _onPlatform = true;
+        }
+        if (_charCollisions._touchingBottom && !_jump._wallSliding)
+        {
+            _landed = true;
         }
     }
 
@@ -106,7 +115,6 @@ public class Move : MonoBehaviour
     {
         if (collision.gameObject.tag == "Platform")
         {
-            Debug.Log("I have left");
             _onPlatform = false;
         }
     }

@@ -29,7 +29,7 @@ namespace ZaccCharv
 
         #region Wall Jumping and Sliding Vars
 
-        private bool _wallSliding;
+        [HideInInspector] public bool _wallSliding;
         [HideInInspector] public bool _wallJumping;
         [HideInInspector] public bool _wallGrab;
 
@@ -144,7 +144,6 @@ namespace ZaccCharv
                 _velocity.y += _jumpSpeed;
                 }
             }
-        
         private void JumpActionCheck()
         {
             if (_charCollisions._touchingBottom)
