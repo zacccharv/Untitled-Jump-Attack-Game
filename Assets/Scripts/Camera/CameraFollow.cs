@@ -1,6 +1,5 @@
 using System.Collections;
 using System.Collections.Generic;
-using Unity.VisualScripting;
 using UnityEngine;
 
 namespace ZaccCharv
@@ -25,19 +24,15 @@ namespace ZaccCharv
             levelBoundsTop = levelBounds.gameObject.GetComponent<Renderer>().bounds.max;
 
             aCamera = gameObject.GetComponent<Camera>();
-
-
-            Debug.Log("Bounds Bottom: " + levelBoundsBottom + " Bounds Top: " + levelBoundsTop);
         }
 
         // Update is called once per frame
         void Update()
         {
-            
-            cameraExtentsYForward = transform.position.y + 11;
-            cameraExtentsXForward = ((aCamera.orthographicSize * 1.778f) + transform.position.x);
-            cameraExtentsYBackward = -11 + transform.position.y;
-            cameraExtentsXBackward = ((aCamera.orthographicSize * -1.778f) + transform.position.x);
+            cameraExtentsYForward = transform.position.y + aCamera.orthographicSize;
+            cameraExtentsXForward = ((aCamera.orthographicSize * (Screen.width / Screen.height)) + transform.position.x);
+            cameraExtentsYBackward = -aCamera.orthographicSize + transform.position.y;
+            cameraExtentsXBackward = ((aCamera.orthographicSize * -(Screen.width / Screen.height)) + transform.position.x);
 
             Debug.DrawLine(levelBoundsBottom, levelBoundsTop, Color.yellow);
             Debug.DrawLine(new Vector3(cameraExtentsXBackward, cameraExtentsYBackward), new Vector3(cameraExtentsXForward, cameraExtentsYForward), Color.red);
