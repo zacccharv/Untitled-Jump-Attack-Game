@@ -49,10 +49,20 @@ namespace ZaccCharv
 
         void Update()
         {
+            if (GetComponent<Dash>()._isDashing)
+            {
+                return;
+            }
+
             _desiredJump |= _controller.input.RetrieveJumpInput();
         }
         private void FixedUpdate()
         {
+            if (GetComponent<Dash>()._isDashing)
+            {
+                return;
+            }
+
             _velocity = _body.velocity;
 
             _charCollisions.CharCollisionCheck();
@@ -149,11 +159,13 @@ namespace ZaccCharv
             if (_charCollisions._touchingBottom)
             {
                 _jumpPhase = 0;
+                GetComponent<Dash>()._dashPhase = 0;
             }
             if (_charCollisions._earlyJump && _body.velocity.y < 0)
             {
                 _charCollisions._earlyJump = false;
                 _jumpPhase = 0;
+
             }
 
             if (_desiredJump && !_wallSliding && !_wallJumping)
@@ -185,18 +197,16 @@ namespace ZaccCharv
                     _desiredJump = false;
                     _velocity.y = Mathf.Max(_fallClamp, _body.velocity.y);
                 }
-                Debug.Log("falling");
             }
             else if (_body.velocity.y == 0)
             {
-                Debug.Log("standing");
                 _body.gravityScale = _defaultGravityScale;
             }
 
             // 2nd Jump check
             if (_charCollisions._touchingBottom == false && _jumpPhase == 2)
             {
-                _body.gravityScale = _doubleJumpMultiplier + .5f;
+                   _body.gravityScale = _doubleJumpMultiplier + .5f;
             }
         }
         private void WallSlidingCheck()
@@ -204,6 +214,7 @@ namespace ZaccCharv
             if (_charCollisions._rightWallhit || _charCollisions._leftWallHit)
             {
                 _wallSliding = true;
+                GetComponent<Dash>()._dashPhase = 0;
             }
             else
             {
@@ -230,22 +241,23 @@ namespace ZaccCharv
         }
         private void WallGrabCheck()
         {
+            Debug.Log(Input.GetButton("WallGrab"));
             if (_wallSliding)
             {
                 if (Input.GetButton("WallGrab"))
                 {
                     _wallGrab = true;
-                    _jumpPhase = 1;
+                    _jumpPhase = _maxAirJumps - 1;
+                    
                 }
                 if (!Input.GetButton("WallGrab"))
                 {
-
-                    _jumpPhase = 1;
                     _wallGrab = false;
                 }
             }
             if (!_wallSliding || Input.GetButton("Jump"))
             {
+                _jumpPhase = 1;
                 _wallGrab = false;
             }
 
@@ -262,7 +274,6 @@ namespace ZaccCharv
         }
         private void NotWallJumping()
         {
-            Debug.Log("not wall jumping");
             _wallJumping = false;
         }
     }
