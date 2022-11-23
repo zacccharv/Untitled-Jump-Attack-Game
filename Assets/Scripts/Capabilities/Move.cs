@@ -33,6 +33,11 @@ public class Move : MonoBehaviour
 
     void Update()
     {
+        if (GetComponent<Dash>()._isDashing)
+        {
+            return;
+        }
+
         _direction.x = _controller.input.RetrieveMoveInput();
 
         if (_controller.input.RetrieveJumpInput())
@@ -43,6 +48,11 @@ public class Move : MonoBehaviour
 
     void FixedUpdate()
     {
+        if (GetComponent<Dash>()._isDashing)
+        {
+            return;
+        }
+
         _desiredVelocity = new Vector2(_direction.x, 0f) * Mathf.Max(_maxSpeed - _ground.Friction, 0f);
         _onGround = _ground.OnGround;
         _velocity = _body.velocity;
@@ -96,7 +106,6 @@ public class Move : MonoBehaviour
 
         if (collision.gameObject.tag == "Platform" && collision != null)
         {
-            Debug.Log("I have Entered");
             _platform = collision.gameObject.GetComponent<PlatformVelocity>();
             _onPlatform = true;
         }
@@ -106,7 +115,6 @@ public class Move : MonoBehaviour
     {
         if (collision.gameObject.tag == "Platform")
         {
-            Debug.Log("I have left");
             _onPlatform = false;
         }
     }

@@ -25,9 +25,6 @@ namespace ZaccCharv
             levelBoundsTop = levelBounds.gameObject.GetComponent<Renderer>().bounds.max;
 
             aCamera = gameObject.GetComponent<Camera>();
-
-
-            Debug.Log("Bounds Bottom: " + levelBoundsBottom + " Bounds Top: " + levelBoundsTop);
         }
 
         // Update is called once per frame
