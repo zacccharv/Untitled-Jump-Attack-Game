@@ -18,10 +18,11 @@ namespace ZaccCharv
         public PlatformVelocity _platform;
         public CharCollisions _charCollisions;
         public Jump _jump;
-        public CharCollisions _charCollions;
+        public Zacccharv.Wallslide _wallSlide;
 
         private float _maxSpeedChange, _acceleration, _previousVelocity;
-        private bool _onGround, _onPlatform, _landed;
+        private bool _onGround, _landed;
+        public bool _onPlatform;
 
         void Start()
         {
@@ -79,7 +80,7 @@ namespace ZaccCharv
                 {
                     _desiredVelocity = new Vector2(_direction.x, 0f) * Mathf.Max(_maxSpeed/2 - _ground.Friction, 0f);
                     _velocity.x = Mathf.MoveTowards(_velocity.x, _desiredVelocity.x, _maxSpeedChange);
-                    if (_jump._wallGrab)
+                    if (_wallSlide._wallGrab)
                     {
                         _desiredVelocity = Vector2.zero;
                     }
@@ -92,12 +93,12 @@ namespace ZaccCharv
                 {
                     _velocity.x = Mathf.MoveTowards(_velocity.x, _desiredVelocity.x, _maxSpeedChange);
 
-                    if (_jump._wallGrab && !_jump._wallJumping)                
+                    if (_wallSlide._wallGrab && !_wallSlide._wallJumping)                
                     {
                         _velocity = Vector2.zero;
                         _desiredVelocity = Vector2.zero;
                     }
-                    else if (_jump._wallGrab && _jump._wallJumping)
+                    else if (_wallSlide._wallGrab && _wallSlide._wallJumping)
                     {
                         _maxAirAcceleration = _maxAcceleration/1.25f;
                     }
@@ -116,7 +117,7 @@ namespace ZaccCharv
                 _platform = collision.gameObject.GetComponent<PlatformVelocity>();
                 _onPlatform = true;
             }
-            if (_charCollisions._touchingBottom && !_jump._wallSliding)
+            if (_charCollisions._touchingBottom && !_wallSlide._wallSliding)
             {
                 _landed = true;
             }
