@@ -1,5 +1,6 @@
 using UnityEngine;
 using UnityEngine.TextCore.Text;
+using Zacccharv;
 
 namespace ZaccCharv
 {
@@ -13,12 +14,11 @@ namespace ZaccCharv
         [SerializeField] private Controller _controller = null;
         public Vector2 _direction;
         public Vector2 _velocity, _desiredVelocity;
-        public Rigidbody2D _body;
+        private Rigidbody2D _body;
         private Ground _ground;
-        public PlatformVelocity _platform;
-        public CharCollisions _charCollisions;
-        public Jump _jump;
-        public Zacccharv.Wallslide _wallSlide;
+        private PlatformVelocity _platform;
+        private CharCollisions _charCollisions;
+        private Jump _jump;
 
         private float _maxSpeedChange, _acceleration, _previousVelocity;
         private bool _onGround, _landed;
@@ -80,7 +80,7 @@ namespace ZaccCharv
                 {
                     _desiredVelocity = new Vector2(_direction.x, 0f) * Mathf.Max(_maxSpeed/2 - _ground.Friction, 0f);
                     _velocity.x = Mathf.MoveTowards(_velocity.x, _desiredVelocity.x, _maxSpeedChange);
-                    if (_wallSlide._wallGrab)
+                    if (_jump._wallGrab)
                     {
                         _desiredVelocity = Vector2.zero;
                     }
@@ -93,12 +93,12 @@ namespace ZaccCharv
                 {
                     _velocity.x = Mathf.MoveTowards(_velocity.x, _desiredVelocity.x, _maxSpeedChange);
 
-                    if (_wallSlide._wallGrab && !_wallSlide._wallJumping)                
+                    if (_jump._wallGrab && !_jump._wallJumping)                
                     {
                         _velocity = Vector2.zero;
                         _desiredVelocity = Vector2.zero;
                     }
-                    else if (_wallSlide._wallGrab && _wallSlide._wallJumping)
+                    else if (_jump._wallGrab && _jump._wallJumping)
                     {
                         _maxAirAcceleration = _maxAcceleration/1.25f;
                     }
@@ -117,7 +117,7 @@ namespace ZaccCharv
                 _platform = collision.gameObject.GetComponent<PlatformVelocity>();
                 _onPlatform = true;
             }
-            if (_charCollisions._touchingBottom && !_wallSlide._wallSliding)
+            if (_charCollisions._touchingBottom && !_jump._wallSliding)
             {
                 _landed = true;
             }

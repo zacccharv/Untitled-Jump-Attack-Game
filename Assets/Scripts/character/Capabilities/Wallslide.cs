@@ -7,8 +7,8 @@ namespace Zacccharv
 {
     public class Wallslide : MonoBehaviour  
     {
-        public Rigidbody2D _body;
-        public Jump _jump;
+        private Rigidbody2D _body;
+        private Jump _jump;
         private CharCollisions _charCollisions;
         
         [HideInInspector] public bool _wallSliding;
@@ -18,7 +18,8 @@ namespace Zacccharv
         void Start()
         {
             _body = GetComponent<Rigidbody2D>();
-            _charCollisions = GetComponent<ZaccCharv.CharCollisions>();
+            _charCollisions = GetComponent<CharCollisions>();
+            _jump = GetComponent<Jump>();
         }
 
         public void WallSlidingCheck()
@@ -26,7 +27,7 @@ namespace Zacccharv
             if (_charCollisions._rightWallhit || _charCollisions._leftWallHit)
             {
                 _wallSliding = true;
-                GetComponent<ZaccCharv.Dash>()._dashPhase = 0;
+                GetComponent<Dash>()._dashPhase = 0;
             }
             else
             {
@@ -51,7 +52,7 @@ namespace Zacccharv
             }
             WallGrabCheck();
         }
-                public void WallGrabCheck()
+        public void WallGrabCheck()
         {
             Debug.Log(Input.GetButton("WallGrab"));
             if (_wallSliding)

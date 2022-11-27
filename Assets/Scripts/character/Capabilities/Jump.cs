@@ -1,5 +1,6 @@
 using UnityEngine;
 using System.Collections;
+using Zacccharv;
 
 namespace ZaccCharv
 {
@@ -18,7 +19,6 @@ namespace ZaccCharv
 
         // See if creating new class solves cluttering scripts
         private CharCollisions _charCollisions;
-        private Zacccharv.Wallslide _wallSlide;
         private Animator _animator;
         private Rigidbody2D _body;
         public Vector2 _velocity;
@@ -30,9 +30,9 @@ namespace ZaccCharv
 
         #region Wall Jumping and Sliding Vars
 
-        // [HideInInspector] public bool _wallSliding;
-        // [HideInInspector] public bool _wallJumping;
-        // [HideInInspector] public bool _wallGrab;
+        [HideInInspector] public bool _wallSliding;
+        [HideInInspector] public bool _wallJumping;
+        [HideInInspector] public bool _wallGrab;
 
         #endregion
 
@@ -70,9 +70,9 @@ namespace ZaccCharv
 
             JumpActionCheck();
 
-            _wallSlide.WallSlidingCheck();
+            WallSlidingCheck();
 
-            _wallSlide.WallGrabCheck();
+            WallGrabCheck();
 
             // This has to go last
             _body.velocity = _velocity;
@@ -80,11 +80,11 @@ namespace ZaccCharv
 
         public void JumpAction()
         {
-            if (_wallSlide._wallSliding)
+            if (_wallSliding)
             {
-                _wallSlide._wallJumping = true;
+                _wallJumping = true;
             }
-            if ((_charCollisions._touchingBottom || _jumpPhase < _maxAirJumps) && !_wallSlide._wallJumping)
+            if ((_charCollisions._touchingBottom || _jumpPhase < _maxAirJumps) && !_wallJumping)
             {
                 _jumpPhase += 1;
 
@@ -103,7 +103,7 @@ namespace ZaccCharv
                 }
                 _velocity.y += _jumpSpeed;
             }
-            else if (!_charCollisions._touchingBottom && _wallSlide._wallJumping)
+            else if (!_charCollisions._touchingBottom && _wallJumping)
             {
                 _jumpPhase += 1;
 
@@ -140,18 +140,18 @@ namespace ZaccCharv
                 }
                 if (_charCollisions._leftWallHit && gameObject.GetComponent<CharacterAnimator>().FlipDirection == 1)
                 {
-                    _velocity.x += 6 * FlipDir + InputAxis;
+                    _velocity.x += 5 * FlipDir + InputAxis;
                 }
                 else if (_charCollisions._rightWallhit && gameObject.GetComponent<CharacterAnimator>().FlipDirection == -1)
                 {
-                    _velocity.x += 6 * FlipDir + InputAxis;
+                    _velocity.x += 5 * FlipDir + InputAxis;
                 }
                 else if (_charCollisions._rightWallhit && gameObject.GetComponent<CharacterAnimator>().FlipDirection == 1)
                 {
                     _velocity.x -= 5 * FlipDir + InputAxis;
                 }
 
-                _wallSlide._wallJumping = true;
+                _wallJumping = true;
                 _velocity.y += _jumpSpeed;
                 }
             }
@@ -168,28 +168,27 @@ namespace ZaccCharv
                 _jumpPhase = 0;
 
             }
-
-            if (_desiredJump && !_wallSlide._wallSliding && !_wallSlide._wallJumping)
+            if (_desiredJump && !_wallSliding && !_wallJumping)
             {
                 _desiredJump = false;
                 JumpAction();
             }
-            else if (_desiredJump && (_wallSlide._wallJumping || _wallSlide._wallSliding) && _jumpPhase < _maxAirJumps)
+            else if (_desiredJump && (_wallJumping || _wallSliding) && _jumpPhase < _maxAirJumps)
             {
                 _desiredJump = false;
                 JumpAction();
-                _wallSlide.NotWallJumping();
+                NotWallJumping();
             }
             //State check if going up down or on ground//
-            if (Input.GetButton("Jump") && _body.velocity.y > 0.1f && !_wallSlide._wallSliding)
+            if (Input.GetButton("Jump") && _body.velocity.y > 0.1f && !_wallSliding)
             {
                 _body.gravityScale = _upwardMovementMultiplier;
             }
-            else if (Input.GetButton("Jump") && _body.velocity.y < 0.1f && !_wallSlide._wallSliding)
+            else if (Input.GetButton("Jump") && _body.velocity.y < 0.1f && !_wallSliding)
             {
                 _body.gravityScale = _downwardMovementMultiplier + .5f;
             }
-            else if (!Input.GetButton("Jump") && !_wallSlide._wallSliding)
+            else if (!Input.GetButton("Jump") && !_wallSliding)
             {
                 _body.gravityScale = _downwardMovementMultiplier + .5f;
 
@@ -210,72 +209,72 @@ namespace ZaccCharv
                    _body.gravityScale = _doubleJumpMultiplier + .5f;
             }
         }
-        // private void WallSlidingCheck()
-        // {
-        //     if (_charCollisions._rightWallhit || _charCollisions._leftWallHit)
-        //     {
-        //         _wallSliding = true;
-        //         GetComponent<Dash>()._dashPhase = 0;
-        //     }
-        //     else
-        //     {
-        //         _wallSliding = false;
-        //     }
+         private void WallSlidingCheck()
+         {
+             if (_charCollisions._rightWallhit || _charCollisions._leftWallHit)
+             {
+                 _wallSliding = true;
+                 GetComponent<Dash>()._dashPhase = 0;
+             }
+             else
+             {
+                 _wallSliding = false;
+             }
 
-        //     // If pushing into wall and going up no upwardMovement. //
-        //     if (_wallSliding && _body.velocity.y > 0 && !_wallGrab)
-        //     {
-        //         _body.gravityScale = _upwardMovementMultiplier + .5f;
-        //     }
-        //     // If pushing into wall going down decreased slide. //
-        //     else if (_wallSliding && (_controller.input.RetrieveMoveInput() != 0 || _controller.input.RetrieveMoveInput2() != 0) && _body.velocity.y < 0 && !_wallGrab)
-        //     {
-        //         _body.gravityScale = _downwardMovementMultiplier / 12;
-        //     }
-        //     // If pushing into wall, going down and no inputs. //
-        //     else if (_wallSliding && _controller.input.RetrieveMoveInput() == 0 && _controller.input.RetrieveMoveInput2() == 0 && !_wallGrab && _body.velocity.y < 0)
-        //     {
-        //         _body.gravityScale = _downwardMovementMultiplier + .5f;
-        //         _velocity.y = Mathf.Max(_fallClamp, _body.velocity.y);
-        //     }
-        //     WallGrabCheck();
-        // }
-        // private void WallGrabCheck()
-        // {
-        //     Debug.Log(Input.GetButton("WallGrab"));
-        //     if (_wallSliding)
-        //     {
-        //         if (Input.GetButton("WallGrab"))
-        //         {
-        //             _wallGrab = true;
-        //             _jumpPhase = _maxAirJumps - 1;
+             // If pushing into wall and going up no upwardMovement. //
+             if (_wallSliding && _body.velocity.y > 0 && !_wallGrab)
+             {
+                 _body.gravityScale = _upwardMovementMultiplier + .5f;
+             }
+             // If pushing into wall going down decreased slide. //
+             else if (_wallSliding && (_controller.input.RetrieveMoveInput() != 0 || _controller.input.RetrieveMoveInput2() != 0) && _body.velocity.y < 0 && !_wallGrab)
+             {
+                 _body.gravityScale = _downwardMovementMultiplier / 12;
+             }
+             // If pushing into wall, going down and no inputs. //
+             else if (_wallSliding && _controller.input.RetrieveMoveInput() == 0 && _controller.input.RetrieveMoveInput2() == 0 && !_wallGrab && _body.velocity.y < 0)
+             {
+                 _body.gravityScale = _downwardMovementMultiplier + .5f;
+                 _velocity.y = Mathf.Max(_fallClamp, _body.velocity.y);
+             }
+             WallGrabCheck();
+         }
+         private void WallGrabCheck()
+         {
+             Debug.Log(Input.GetButton("WallGrab"));
+             if (_wallSliding)
+             {
+                 if (Input.GetButton("WallGrab"))
+                 {
+                     _wallGrab = true;
+                     _jumpPhase = _maxAirJumps - 1;
                     
-        //         }
-        //         if (!Input.GetButton("WallGrab"))
-        //         {
-        //             _wallGrab = false;
-        //         }
-        //     }
-        //     if (!_wallSliding || Input.GetButton("Jump"))
-        //     {
-        //         _jumpPhase = 1;
-        //         _wallGrab = false;
-        //     }
+                 }
+                 if (!Input.GetButton("WallGrab"))
+                 {
+                     _wallGrab = false;
+                 }
+             }
+             if (!_wallSliding || Input.GetButton("Jump"))
+             {
+                _jumpPhase = 0;
+                 _wallGrab = false;
+             }
 
-        //     if (_wallGrab && !Input.GetButton("Jump"))
-        //     {
-        //         _body.gravityScale = 0;
-        //         _body.velocity = new Vector2(0, 0);
-        //         _wallGrab = true;
-        //     }
-        //     else if (_wallGrab && Input.GetButton("Jump"))
-        //     {
-        //         _body.gravityScale = _upwardMovementMultiplier + .5f;
-        //     }
-        // }
-        // private void NotWallJumping()
-        // {
-        //     _wallJumping = false;
-        // }
+             if (_wallGrab && !Input.GetButton("Jump"))
+             {
+                 _body.gravityScale = 0;
+                 _body.velocity = new Vector2(0, 0);
+                 _wallGrab = true;
+             }
+             else if (_wallGrab && Input.GetButton("Jump"))
+             {
+                 _body.gravityScale = _upwardMovementMultiplier + .5f;
+             }
+         }
+         private void NotWallJumping()
+         {
+             _wallJumping = false;
+        }
     }
 }

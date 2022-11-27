@@ -16,15 +16,18 @@ namespace ZaccCharv
 
         private Coroutine LerpCoroutine;
         public float _lerpSpeed = 3;
+        public float _offset;
         public AnimationCurve _curve;
 
         private void Start()
         {
             LerpCoroutine = StartCoroutine(LerpRectFixedSpeed());
+            transform.localScale = new Vector3(_startWidthX, transform.localScale.y, transform.localScale.z);
         }
 
         private IEnumerator LerpRectFixedSpeed()
         {
+            bool _offsetDone = false;
             while (true)
             {
                 _startWidth = new Vector3(_startWidthX, transform.localScale.y, transform.localScale.z);
@@ -34,6 +37,12 @@ namespace ZaccCharv
                 float _remainingWidth = _width;
 
                 bool forward = true;
+
+                if(!_offsetDone)
+                {
+                    _offsetDone = true;
+                    yield return new WaitForSeconds(_offset);
+                }
 
                 while (_remainingWidth > 0 && forward == true)
                 {

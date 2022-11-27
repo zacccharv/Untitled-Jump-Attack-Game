@@ -26,7 +26,7 @@ namespace ZaccCharv
 
             if (Input.GetButtonDown("Dash"))
             {
-                if (GetComponent<CharCollisions>()._touchingBottom || GetComponent<Wallslide>()._wallSliding || _dashPhase < 1 )
+                if (GetComponent<CharCollisions>()._touchingBottom || GetComponent<Jump>()._wallSliding || _dashPhase < 1 )
                 {
                     coroutine = Dashing();
                     StartCoroutine(coroutine);
