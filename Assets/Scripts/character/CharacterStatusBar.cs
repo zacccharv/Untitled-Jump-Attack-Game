@@ -75,7 +75,7 @@ namespace ZaccCharv
 
         void SubtractFromCurrent()
         {
-            current -= 10;
+            current -= 5;
         }
     }
 }
