@@ -24,21 +24,22 @@ namespace ZaccCharv
             levelBoundsTop = levelBounds.gameObject.GetComponent<Renderer>().bounds.max;
 
             aCamera = gameObject.GetComponent<Camera>();
+            Debug.Log("Camera started");
         }
 
         // Update is called once per frame
         void Update()
         {
             cameraExtentsYForward = transform.position.y + aCamera.orthographicSize;
-            cameraExtentsXForward = ((aCamera.orthographicSize * (Screen.width / Screen.height)) + transform.position.x);
-            cameraExtentsYBackward = -aCamera.orthographicSize + transform.position.y;
-            cameraExtentsXBackward = ((aCamera.orthographicSize * -(Screen.width / Screen.height)) + transform.position.x);
+            cameraExtentsXForward = transform.position.x + ((aCamera.orthographicSize * (1.777f)));
+            cameraExtentsYBackward = aCamera.orthographicSize - transform.position.y;
+            cameraExtentsXBackward = ((aCamera.orthographicSize * (1.777f)) - transform.position.x);
 
             Debug.DrawLine(levelBoundsBottom, levelBoundsTop, Color.yellow);
             Debug.DrawLine(new Vector3(cameraExtentsXBackward, cameraExtentsYBackward), new Vector3(cameraExtentsXForward, cameraExtentsYForward), Color.red);
 
-            float targetX = Mathf.Clamp(characterPosition.position.x, levelBoundsBottom.x - cameraExtentsXBackward , levelBoundsTop.x + cameraExtentsXForward);
-            float targetY = Mathf.Clamp(characterPosition.position.y, levelBoundsBottom.y - cameraExtentsYBackward, levelBoundsTop.y + cameraExtentsYForward);
+            float targetX = Mathf.Clamp(characterPosition.position.x, levelBoundsBottom.x + cameraExtentsXBackward, levelBoundsTop.x + cameraExtentsXForward);
+            float targetY = Mathf.Clamp(characterPosition.position.y, levelBoundsBottom.y + cameraExtentsYBackward, levelBoundsTop.y + cameraExtentsYForward);
 
             target = new Vector3 (targetX, targetY, 0);
             transform.position = Vector3.Lerp(transform.position, target, Time.deltaTime);
