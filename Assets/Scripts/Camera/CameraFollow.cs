@@ -10,10 +10,10 @@ namespace ZaccCharv
         public GameObject levelBounds;
         private Vector3 levelBoundsBottom;
         private Vector3 levelBoundsTop;
-        private float cameraExtentsYForward;
-        private float cameraExtentsXForward;
-        private float cameraExtentsYBackward;
-        private float cameraExtentsXBackward;
+        private float cameraExtentsY;
+        private float cameraExtentsX;
+/*         private float cameraExtentsYBackward;
+        private float cameraExtentsXBackward; */
         private Vector3 target;
 
         [SerializeField] private Camera aCamera;
@@ -29,16 +29,16 @@ namespace ZaccCharv
         // Update is called once per frame
         void Update()
         {
-            cameraExtentsYForward = transform.position.y + aCamera.orthographicSize;
-            cameraExtentsXForward = ((aCamera.orthographicSize * (Screen.width / Screen.height)) + transform.position.x);
-            cameraExtentsYBackward = -aCamera.orthographicSize + transform.position.y;
-            cameraExtentsXBackward = ((aCamera.orthographicSize * -(Screen.width / Screen.height)) + transform.position.x);
+            cameraExtentsY = aCamera.orthographicSize + transform.position.y;
+            cameraExtentsX = ((aCamera.orthographicSize * (Screen.width / Screen.height)) + transform.position.x);
+            /* cameraExtentsYBackward = -aCamera.orthographicSize + transform.position.y;
+            cameraExtentsXBackward = ((-aCamera.orthographicSize * (Screen.width / Screen.height)) + transform.position.x);*/
 
             Debug.DrawLine(levelBoundsBottom, levelBoundsTop, Color.yellow);
-            Debug.DrawLine(new Vector3(cameraExtentsXBackward, cameraExtentsYBackward), new Vector3(cameraExtentsXForward, cameraExtentsYForward), Color.red);
+            Debug.DrawLine(new Vector3(-cameraExtentsX, -cameraExtentsY), new Vector3(cameraExtentsX, cameraExtentsY), Color.red);
 
-            float targetX = Mathf.Clamp(characterPosition.position.x, levelBoundsBottom.x - cameraExtentsXBackward , levelBoundsTop.x + cameraExtentsXForward);
-            float targetY = Mathf.Clamp(characterPosition.position.y, levelBoundsBottom.y - cameraExtentsYBackward, levelBoundsTop.y + cameraExtentsYForward);
+            float targetX = Mathf.Clamp(characterPosition.position.x, levelBoundsBottom.x + cameraExtentsX , levelBoundsTop.x - cameraExtentsX);
+            float targetY = Mathf.Clamp(characterPosition.position.y, levelBoundsBottom.y + cameraExtentsX, levelBoundsTop.y - cameraExtentsY);
 
             target = new Vector3 (targetX, targetY, 0);
             transform.position = Vector3.Lerp(transform.position, target, Time.deltaTime);
