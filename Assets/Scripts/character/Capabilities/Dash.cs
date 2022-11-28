@@ -19,6 +19,7 @@ namespace ZaccCharv
         void Start()
         {
             rb = GetComponent<Rigidbody2D>();
+            _jump = GetComponent<Jump>();
         }
 
         void Update()
@@ -27,6 +28,8 @@ namespace ZaccCharv
             {
                 if (GetComponent<CharCollisions>()._touchingBottom || GetComponent<Jump>()._wallSliding || _dashPhase < 1 )
                 {
+                    if (_jump._wallSliding) _jump._jumpPhase = 0;
+                    
                     coroutine = Dashing();
                     StartCoroutine(coroutine);
                     _dashPhase += 1;
