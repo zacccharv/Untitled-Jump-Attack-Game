@@ -8,6 +8,7 @@ namespace ZaccCharv
     public class Dash : MonoBehaviour
     {
         private Rigidbody2D rb;
+        private Jump _jump;
 
         private float _direction;
         [HideInInspector] public bool _canDash = true, _isDashing;
@@ -22,8 +23,6 @@ namespace ZaccCharv
 
         void Update()
         {
-
-
             if (Input.GetButtonDown("Dash"))
             {
                 if (GetComponent<CharCollisions>()._touchingBottom || GetComponent<Jump>()._wallSliding || _dashPhase < 1 )
@@ -33,7 +32,6 @@ namespace ZaccCharv
                     _dashPhase += 1;
                     _direction = GetComponent<CharacterAnimator>().FlipDirection;
                     Debug.Log("this is direction" + _direction);
-
                 }
             }
 
@@ -45,16 +43,17 @@ namespace ZaccCharv
 
             _canDash = false;
             _isDashing = true;
-            float originalGravity = rb.gravityScale;
+            
             rb.gravityScale = 0f;
             rb.velocity = new Vector2(1 * dashingPower * _direction, 0f);
             yield return new WaitForSeconds(dashingTime);
 
-            rb.gravityScale = originalGravity;
+            Debug.Log("donedashing");
+
+            rb.velocity = new Vector2(.5f * dashingPower * _direction, 0f);
+
+            _dashPhase = 1;
             _isDashing = false;
-
-            yield return new WaitForSeconds(dashingCoolDown);
-
             _canDash = true;
         }
     }
