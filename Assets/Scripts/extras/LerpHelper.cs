@@ -10,7 +10,7 @@ namespace ZaccCharv
     public class LerpHelper : MonoBehaviour
     {
         //swappable class
-        public GameObject _light2D;
+        private Light2D _light2D;
         private Coroutine _coroutine;
 
         public float _valueB;
