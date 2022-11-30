@@ -65,7 +65,7 @@ namespace ZaccCharv
             for (int i = total; i > 0; i--)
             { 
                 SubtractFromCurrent();
-                if (current == 10)
+                if (current == 5)
                 {
                     SceneManager.LoadScene(SceneManager.GetActiveScene().name);
                 }

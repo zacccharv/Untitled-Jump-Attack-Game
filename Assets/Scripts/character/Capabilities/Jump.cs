@@ -10,7 +10,7 @@ namespace ZaccCharv
         #region Jumping EarlyJump Falling FallClamp Vars
 
         [SerializeField, Range(0f, 10f)] private float _jumpHeight = 3f;
-        [HideInInspector, Range(0, 5)] public int _maxAirJumps = 1;
+        [SerializeField, Range(0, 5)] public int _maxAirJumps = 0;
         [SerializeField, Range(0f, 5f)] public float _downwardMovementMultiplier = 3f;
         [SerializeField, Range(0f, 5f)] public float _upwardMovementMultiplier = 1.7f;
         [SerializeField, Range(0f, 5f)] public float _doubleJumpMultiplier = 3f;
@@ -211,6 +211,7 @@ namespace ZaccCharv
             if (_charCollisions._rightWallhit || _charCollisions._leftWallHit)
             {
                 _wallSliding = true;
+                _jumpPhase = 0;
                 GetComponent<Dash>()._dashPhase = 0;
             }
             else if (gameObject.GetComponent<Dash>()._isDashing)

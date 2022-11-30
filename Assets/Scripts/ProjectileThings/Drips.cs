@@ -10,6 +10,7 @@ namespace ZaccCharv
         private float _repeatTime = .3f;
         public GameObject _prefab;
         int num = 0;
+        int modulater = 18;
         private void Start() 
         {
             InvokeRepeating("DripDrop", _offsetTime, _repeatTime);
@@ -20,16 +21,16 @@ namespace ZaccCharv
             num++;
             int randNum = Mathf.RoundToInt(Random.Range(0, 2));
 
-            if (num % 12 < 7)
+            if (num % modulater < 7)
             {
-                if (num % 12 >= 3)
+                if (num % modulater >= 3)
                 {
                     if (randNum == 0)
                     {
                         Instantiate(_prefab, transform.position, Quaternion.identity, gameObject.transform);
                     }
                 }
-                else if (num % 12 == 0 || num % 12 == 2)
+                else if (num % modulater == 0 || num % modulater == 2)
                 {
                     Instantiate(_prefab, transform.position, Quaternion.identity, gameObject.transform);
                 }
