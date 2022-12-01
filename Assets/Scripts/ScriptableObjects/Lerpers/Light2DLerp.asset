@@ -12,3 +12,4 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: ff2becfd3dbd2074b8caf4cef4d6cc6c, type: 3}
   m_Name: Light2DLerp
   m_EditorClassIdentifier: 
+  obj: {fileID: 283355296144995909, guid: 2c20e8da4daf298449d7187c9db3ec0c, type: 3}
