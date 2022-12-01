@@ -7,19 +7,19 @@ using UnityEngine.Rendering.Universal;
 
 namespace ZaccCharv
 {
+    [RequireComponent(typeof(LerpOut))]
     public class LerpHelper : MonoBehaviour
     {
-        //swappable class
-        private Light2D _light2D;
         private Coroutine _coroutine;
-
+        [SerializeField] private LerpOut _lerpOut = null;
+        [HideInInspector] public float _lerpStartValue;
         public float _valueB;
         public float _duration;
 
         void Start()
         {
-            //swappable component
-            _light2D = GetComponent<Light2D>();
+
+            _lerpStartValue = _lerpOut.lerpValue.ValueA(gameObject);
 
             _coroutine = StartCoroutine(LerpFixedSpeed(_valueB, _duration));
         }
@@ -32,6 +32,7 @@ namespace ZaccCharv
             return progress;
         }
 
+
         private IEnumerator LerpFixedSpeed(float _valueB, float _duration)
         {
             while (true)
@@ -39,7 +40,7 @@ namespace ZaccCharv
                 float timer = 0;
                 float progress = 0;
 
-                float _valueA = _light2D.intensity;
+                float _valueA = _lerpStartValue;
 
                 float lerpdValue = _valueA;
                 bool forward = true;
@@ -49,18 +50,14 @@ namespace ZaccCharv
                     progress = (timer / _duration);
                     progress = SmoothProgress(progress);
 
-                    //can be swapped
                     lerpdValue = Mathf.Lerp(_valueA, _valueB, progress);
-                    Debug.Log("A = brightnessA");
-                    Debug.Log("B = brightnessB");
                     
-                    _light2D.intensity = lerpdValue;
+                    _lerpStartValue = lerpdValue;
+
+                    Debug.Log(_lerpStartValue);
 
                     // can't be swapped
                     timer += Time.deltaTime;
-
-                    //can be swapped
-                    Debug.Log("This is the timer: " + timer + ", This is progress: " + progress + ", This is Lerpd value: " + _light2D.intensity);
                     yield return null;   
                 } 
 
@@ -73,17 +70,14 @@ namespace ZaccCharv
                     progress = SmoothProgress(progress);
 
                     //can be swapped
-                    lerpdValue = Mathf.Lerp(_valueB, _valueA, progress);
-                    Debug.Log("A = brightnessB");
-                    Debug.Log("B = brightnessA");      
+                    lerpdValue = Mathf.Lerp(_valueB, _valueA, progress);     
 
-                    _light2D.intensity = lerpdValue;
+                    _lerpStartValue = lerpdValue;
+                    Debug.Log(_lerpStartValue);
 
                     // can't be swapped
                     timer += Time.deltaTime;
 
-                    //can be swapped
-                    Debug.Log("This is the timer: " + timer + ", This is progress: " + progress + ", This is lerpd value: " + _light2D.intensity);
                     yield return null;           
                 }
             }
