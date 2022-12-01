@@ -9,8 +9,6 @@ namespace ZaccCharv
 {
     public class CharacterStatusBar : MonoBehaviour
     {
-/*        [SerializeField] private bool safe = false;*/
-
         private IEnumerator coroutine;
 
         public int staminaMax;
@@ -33,7 +31,6 @@ namespace ZaccCharv
         {
             if (collision.gameObject.layer == 10 && coroutine != null)
             {
-/*                safe = true;*/
                 current = total;
                 StopCoroutine(coroutine);
             }
@@ -44,7 +41,16 @@ namespace ZaccCharv
 
                 coroutine = Timer(staminaBurnRate, total);
                 StartCoroutine(coroutine);
+
                 collision.gameObject.SetActive(false);
+            }
+            if (collision.gameObject.tag == "Faerie")
+            {
+                current = total;
+                StopCoroutine(coroutine);
+
+                coroutine = Timer(staminaBurnRate / 2, total);
+                StartCoroutine(coroutine);
             }
         }
 
@@ -52,15 +58,22 @@ namespace ZaccCharv
         {
             if (collision.gameObject.layer == 10 )
             {
-/*                safe = false;*/
                 coroutine = Timer(staminaBurnRate, total);
                 StartCoroutine(coroutine);
             }
+            if (collision.gameObject.tag == "Faerie")
+            {
+                StopCoroutine(coroutine);
+
+                coroutine = Timer(staminaBurnRate, current);
+                StartCoroutine(coroutine);
+            }
+
         }
 
-        IEnumerator Timer(float waitTime, int total)
+        IEnumerator Timer(float waitTime, int _total)
         {
-            current = total;
+            current = _total;
 
             for (int i = total; i > 0; i--)
             { 
