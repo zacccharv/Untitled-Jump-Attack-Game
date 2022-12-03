@@ -9,7 +9,7 @@ namespace ZaccCharv
     public class CharacterStaminaBar : MonoBehaviour
     {
         public GameObject character;
-        [SerializeField] private Slider slider;
+        private Slider slider;
 
         public int _current;
 

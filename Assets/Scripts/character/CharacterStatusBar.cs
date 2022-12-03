@@ -42,14 +42,15 @@ namespace ZaccCharv
                 coroutine = Timer(staminaBurnRate, total);
                 StartCoroutine(coroutine);
 
+
+
                 collision.gameObject.SetActive(false);
             }
             if (collision.gameObject.tag == "Faerie")
             {
-                current = total;
                 StopCoroutine(coroutine);
 
-                coroutine = Timer(staminaBurnRate / 2, total);
+                coroutine = Timer(staminaBurnRate / 2, current);
                 StartCoroutine(coroutine);
             }
         }
